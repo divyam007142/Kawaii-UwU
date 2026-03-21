@@ -291,89 +291,248 @@ export async function createWelcomeCard(
 // ── Help Banner ──────────────────────────────────────────────────────────────
 
 export async function createHelpBanner(): Promise<Buffer> {
-  const W = 700, H = 195;
+  const W = 700, H = 200;
   const canvas = createCanvas(W, H);
   const ctx    = canvas.getContext("2d") as any;
 
-  // Background
-  const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0,   "#1a0535");
-  bg.addColorStop(0.4, "#5c1282");
-  bg.addColorStop(0.6, "#a61c5e");
-  bg.addColorStop(1,   "#1a0535");
-  ctx.fillStyle = bg;
+  // ─────────────────────────────────────────────────────────────────────────
+  // BACKGROUND: Anime night sky
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // 1. Deep night sky base (dark indigo → midnight navy)
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0,    "#060118");
+  sky.addColorStop(0.35, "#0e0230");
+  sky.addColorStop(0.7,  "#1a0545");
+  sky.addColorStop(1,    "#100335");
+  ctx.fillStyle = sky;
   ctx.fillRect(0, 0, W, H);
 
-  // Diagonal shimmer
-  const shimmer = ctx.createLinearGradient(0, 0, W, H);
-  shimmer.addColorStop(0,   "rgba(255,182,217,0)");
-  shimmer.addColorStop(0.4, "rgba(255,182,217,0.15)");
-  shimmer.addColorStop(1,   "rgba(189,147,249,0.1)");
-  ctx.fillStyle = shimmer;
+  // 2. Horizontal colour sweep (indigo → deep magenta → indigo)
+  const sweep = ctx.createLinearGradient(0, 0, W, 0);
+  sweep.addColorStop(0,    "rgba(10,2,40,0.6)");
+  sweep.addColorStop(0.35, "rgba(80,10,140,0.35)");
+  sweep.addColorStop(0.65, "rgba(160,20,100,0.35)");
+  sweep.addColorStop(1,    "rgba(10,2,40,0.6)");
+  ctx.fillStyle = sweep;
   ctx.fillRect(0, 0, W, H);
 
-  // Center glow
-  const cg = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, 230);
-  cg.addColorStop(0, "rgba(255,121,198,0.22)");
-  cg.addColorStop(1, "rgba(255,121,198,0)");
-  ctx.fillStyle = cg;
+  // 3. Pink nebula cloud — left area
+  const neb1 = ctx.createRadialGradient(160, 70, 0, 160, 70, 200);
+  neb1.addColorStop(0,   "rgba(255,80,165,0.24)");
+  neb1.addColorStop(0.5, "rgba(200,50,140,0.1)");
+  neb1.addColorStop(1,   "rgba(255,80,165,0)");
+  ctx.fillStyle = neb1;
   ctx.fillRect(0, 0, W, H);
 
-  // Top border
-  const tl = ctx.createLinearGradient(0, 0, W, 0);
-  tl.addColorStop(0,   "rgba(255,121,198,0)");
-  tl.addColorStop(0.5, "rgba(255,121,198,0.95)");
-  tl.addColorStop(1,   "rgba(255,121,198,0)");
-  ctx.fillStyle = tl;
-  ctx.fillRect(0, 0, W, 2);
+  // 4. Purple nebula cloud — right area
+  const neb2 = ctx.createRadialGradient(540, 120, 0, 540, 120, 190);
+  neb2.addColorStop(0,   "rgba(150,70,255,0.22)");
+  neb2.addColorStop(0.5, "rgba(110,50,200,0.08)");
+  neb2.addColorStop(1,   "rgba(150,70,255,0)");
+  ctx.fillStyle = neb2;
+  ctx.fillRect(0, 0, W, H);
 
-  // Bottom border
-  const bl = ctx.createLinearGradient(0, 0, W, 0);
-  bl.addColorStop(0,   "rgba(189,147,249,0)");
-  bl.addColorStop(0.5, "rgba(189,147,249,0.95)");
-  bl.addColorStop(1,   "rgba(189,147,249,0)");
-  ctx.fillStyle = bl;
-  ctx.fillRect(0, H - 2, W, 2);
+  // 5. Soft teal glow at bottom centre
+  const teal = ctx.createRadialGradient(W / 2, H, 0, W / 2, H, 160);
+  teal.addColorStop(0, "rgba(60,220,200,0.1)");
+  teal.addColorStop(1, "rgba(60,220,200,0)");
+  ctx.fillStyle = teal;
+  ctx.fillRect(0, 0, W, H);
 
-  // Decorations
-  const decos = [
-    { t: "✿", x: 44,  y: 40,  s: 26, c: "#ff79c6", a: 0.58 },
-    { t: "✿", x: 656, y: 40,  s: 26, c: "#ff79c6", a: 0.58 },
-    { t: "✿", x: 44,  y: 155, s: 18, c: "#b2f7ef", a: 0.48 },
-    { t: "✿", x: 656, y: 155, s: 18, c: "#b2f7ef", a: 0.48 },
-    { t: "✦", x: 118, y: 98,  s: 16, c: "#ffd700", a: 0.55 },
-    { t: "✦", x: 582, y: 98,  s: 16, c: "#ffd700", a: 0.55 },
-    { t: "♡", x: 26,  y: 98,  s: 15, c: "#ff79c6", a: 0.48 },
-    { t: "♡", x: 674, y: 98,  s: 15, c: "#ff79c6", a: 0.48 },
-    { t: "·",  x: 162, y: 28,  s: 16, c: "#ffd700", a: 0.55 },
-    { t: "·",  x: 538, y: 28,  s: 16, c: "#ffd700", a: 0.55 },
-    { t: "·",  x: 162, y: 168, s: 15, c: "#c9b1ff", a: 0.5  },
-    { t: "·",  x: 538, y: 168, s: 15, c: "#c9b1ff", a: 0.5  },
-    { t: "✿", x: 350, y: 14,  s: 12, c: "#ffb3de", a: 0.35 },
-    { t: "✿", x: 350, y: 182, s: 12, c: "#ffb3de", a: 0.35 },
+  // ─────────────────────────────────────────────────────────────────────────
+  // BOKEH CIRCLES (dreamy depth effect)
+  // ─────────────────────────────────────────────────────────────────────────
+  const bokehList = [
+    { x: 48,  y: 28,  r: 32, r1: "rgba(255,90,180,0.07)",   r0: "rgba(255,90,180,0)"  },
+    { x: 80,  y: 158, r: 22, r1: "rgba(190,90,255,0.08)",   r0: "rgba(190,90,255,0)"  },
+    { x: 620, y: 22,  r: 36, r1: "rgba(140,70,255,0.07)",   r0: "rgba(140,70,255,0)"  },
+    { x: 658, y: 162, r: 24, r1: "rgba(255,110,200,0.08)",  r0: "rgba(255,110,200,0)" },
+    { x: 350, y: 14,  r: 20, r1: "rgba(255,200,230,0.06)",  r0: "rgba(255,200,230,0)" },
+    { x: 265, y: 178, r: 28, r1: "rgba(170,90,255,0.07)",   r0: "rgba(170,90,255,0)"  },
+    { x: 430, y: 185, r: 18, r1: "rgba(255,150,220,0.06)",  r0: "rgba(255,150,220,0)" },
   ];
-  for (const d of decos) glyph(ctx, d.t, d.x, d.y, d.s, d.c, d.a);
+  for (const b of bokehList) {
+    const bg2 = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+    bg2.addColorStop(0, b.r1);
+    bg2.addColorStop(1, b.r0);
+    ctx.fillStyle = bg2;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
-  // Main title
+  // ─────────────────────────────────────────────────────────────────────────
+  // CRESCENT MOON — top-left corner
+  // ─────────────────────────────────────────────────────────────────────────
+  const mx = 58, my = 46, mr = 26;
+
+  // Moon outer glow
+  const moonGlow = ctx.createRadialGradient(mx, my, mr * 0.4, mx, my, mr * 2.4);
+  moonGlow.addColorStop(0,   "rgba(255,248,200,0.28)");
+  moonGlow.addColorStop(0.5, "rgba(255,240,180,0.1)");
+  moonGlow.addColorStop(1,   "rgba(255,240,180,0)");
+  ctx.fillStyle = moonGlow;
+  ctx.beginPath();
+  ctx.arc(mx, my, mr * 2.4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Moon body
+  ctx.fillStyle = "#fff9e6";
+  ctx.beginPath();
+  ctx.arc(mx, my, mr, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Crescent cutout (overlay sky colour)
+  ctx.fillStyle = "#0e0230";
+  ctx.beginPath();
+  ctx.arc(mx + 11, my - 6, mr * 0.85, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // STARS — small glowing circles
+  // ─────────────────────────────────────────────────────────────────────────
+  const starList = [
+    // top band
+    { x: 108, y: 12, r: 1.8, g: 7  },
+    { x: 142, y: 32, r: 1.1, g: 4  },
+    { x: 178, y: 10, r: 2.2, g: 9  },
+    { x: 215, y: 22, r: 1.0, g: 4  },
+    { x: 255, y: 8,  r: 1.5, g: 6  },
+    { x: 308, y: 18, r: 1.8, g: 7  },
+    { x: 348, y: 7,  r: 1.0, g: 4  },
+    { x: 390, y: 15, r: 2.0, g: 8  },
+    { x: 432, y: 9,  r: 1.2, g: 5  },
+    { x: 468, y: 24, r: 1.6, g: 6  },
+    { x: 505, y: 10, r: 2.2, g: 9  },
+    { x: 542, y: 28, r: 1.0, g: 4  },
+    { x: 575, y: 12, r: 1.8, g: 7  },
+    { x: 612, y: 22, r: 1.1, g: 4  },
+    { x: 645, y: 8,  r: 2.0, g: 8  },
+    { x: 680, y: 18, r: 1.4, g: 5  },
+    // sides / scattered
+    { x: 22,  y: 120, r: 1.0, g: 4 },
+    { x: 688, y: 88,  r: 1.2, g: 5 },
+    { x: 678, y: 140, r: 1.0, g: 4 },
+    { x: 18,  y: 75,  r: 1.4, g: 5 },
+    { x: 112, y: 55,  r: 1.0, g: 4 },
+    { x: 588, y: 55,  r: 1.0, g: 4 },
+  ];
+  for (const s of starList) {
+    // Soft halo
+    const halo = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.g);
+    halo.addColorStop(0, "rgba(255,255,255,0.2)");
+    halo.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.g, 0, Math.PI * 2);
+    ctx.fill();
+    // Star core
+    ctx.fillStyle = "#ffffff";
+    ctx.globalAlpha = 0.9;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // SAKURA PETALS — drawn as rotated ovals with gradient fill
+  // ─────────────────────────────────────────────────────────────────────────
+  function drawPetal(px: number, py: number, rot: number, sz: number, alpha: number) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(px, py);
+    ctx.rotate(rot);
+    const pg = ctx.createRadialGradient(0, -sz * 0.2, 0, 0, sz * 0.3, sz);
+    pg.addColorStop(0,   "rgba(255,210,230,0.95)");
+    pg.addColorStop(0.55, "rgba(255,160,200,0.7)");
+    pg.addColorStop(1,   "rgba(255,120,175,0)");
+    ctx.fillStyle = pg;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, sz * 0.42, sz, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  const petalList = [
+    { x: 8,   y: 58,  r: 0.38,  s: 13, a: 0.55 },
+    { x: 30,  y: 142, r: -0.85, s: 11, a: 0.48 },
+    { x: 68,  y: 108, r: 1.22,  s: 9,  a: 0.42 },
+    { x: 618, y: 48,  r: -0.52, s: 12, a: 0.52 },
+    { x: 652, y: 142, r: 0.88,  s: 10, a: 0.46 },
+    { x: 690, y: 96,  r: -1.15, s: 9,  a: 0.42 },
+    { x: 272, y: 180, r: 0.6,   s: 8,  a: 0.38 },
+    { x: 418, y: 185, r: -0.3,  s: 10, a: 0.4  },
+    { x: 132, y: 168, r: 1.05,  s: 8,  a: 0.36 },
+    { x: 558, y: 178, r: -0.72, s: 9,  a: 0.4  },
+    { x: 340, y: 10,  r: 0.9,   s: 7,  a: 0.3  },
+    { x: 480, y: 5,   r: -0.4,  s: 8,  a: 0.32 },
+  ];
+  for (const p of petalList) drawPetal(p.x, p.y, p.r, p.s, p.a);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 4-POINTED SPARKLE GLYPHS
+  // ─────────────────────────────────────────────────────────────────────────
+  const sparkleList = [
+    { x: 118, y: 40,  s: 13, c: "#ffd700", a: 0.7 },
+    { x: 582, y: 44,  s: 12, c: "#ffd700", a: 0.65 },
+    { x: 198, y: 168, s: 11, c: "#ff9de2", a: 0.6 },
+    { x: 502, y: 165, s: 11, c: "#ff9de2", a: 0.6 },
+    { x: 350, y: 188, s: 10, c: "#ffd700", a: 0.48 },
+    { x: 350, y: 10,  s: 10, c: "#c9b1ff", a: 0.45 },
+  ];
+  for (const sp of sparkleList) glyph(ctx, "✦", sp.x, sp.y, sp.s, sp.c, sp.a);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // BORDER LINES
+  // ─────────────────────────────────────────────────────────────────────────
+  const tBorder = ctx.createLinearGradient(0, 0, W, 0);
+  tBorder.addColorStop(0,   "rgba(255,121,198,0)");
+  tBorder.addColorStop(0.5, "rgba(255,121,198,0.95)");
+  tBorder.addColorStop(1,   "rgba(255,121,198,0)");
+  ctx.fillStyle = tBorder;
+  ctx.fillRect(0, 0, W, 2.5);
+
+  const bBorder = ctx.createLinearGradient(0, 0, W, 0);
+  bBorder.addColorStop(0,   "rgba(189,147,249,0)");
+  bBorder.addColorStop(0.5, "rgba(189,147,249,0.95)");
+  bBorder.addColorStop(1,   "rgba(189,147,249,0)");
+  ctx.fillStyle = bBorder;
+  ctx.fillRect(0, H - 2.5, W, 2.5);
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TEXT
+  // ─────────────────────────────────────────────────────────────────────────
   ctx.textAlign    = "center";
   ctx.textBaseline = "middle";
-  const tGrad = ctx.createLinearGradient(W / 2 - 195, 0, W / 2 + 195, 0);
+
+  // Title with glow
+  ctx.save();
+  ctx.shadowColor = "rgba(255,105,180,0.9)";
+  ctx.shadowBlur  = 22;
+  const tGrad = ctx.createLinearGradient(W / 2 - 205, 0, W / 2 + 205, 0);
   tGrad.addColorStop(0,   "#ff79c6");
   tGrad.addColorStop(0.5, "#fffce0");
   tGrad.addColorStop(1,   "#bd93f9");
   ctx.fillStyle = tGrad;
   ctx.font      = "bold 54px sans-serif";
-  ctx.fillText("✿ Kawaii Bot ✿", W / 2, H / 2 - 24);
+  ctx.fillText("✿ Kawaii Bot ✿", W / 2, H / 2 - 26);
+  ctx.restore();
 
-  // Subtitle
-  ctx.fillStyle = "rgba(255,179,222,0.82)";
-  ctx.font      = "17px sans-serif";
+  // Subtitle with soft glow
+  ctx.save();
+  ctx.shadowColor = "rgba(255,100,180,0.55)";
+  ctx.shadowBlur  = 10;
+  ctx.fillStyle   = "rgba(255,182,222,0.9)";
+  ctx.font        = "17px sans-serif";
   ctx.fillText("♡ Your cute economy, anime & fun companion~ ♡", W / 2, H / 2 + 22);
+  ctx.restore();
 
   // Tag line
-  ctx.fillStyle = "rgba(201,177,255,0.62)";
+  ctx.fillStyle = "rgba(201,177,255,0.68)";
   ctx.font      = "13px sans-serif";
-  ctx.fillText("✦ Slash Commands Ready  •  Type /help anytime  •  27 commands~ ✦", W / 2, H / 2 + 50);
+  ctx.fillText("✦ Slash Commands Ready  •  Type /help anytime  •  27 commands~ ✦", W / 2, H / 2 + 52);
 
   return canvas.toBuffer("image/png");
 }
