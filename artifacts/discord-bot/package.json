@@ -1,0 +1,19 @@
+{
+  "name": "@workspace/discord-bot",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --enable-source-maps --watch dist/index.mjs",
+    "build": "node ./build.mjs",
+    "start": "node --enable-source-maps dist/index.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "discord.js": "^14.19.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "esbuild": "^0.25.4"
+  }
+}
