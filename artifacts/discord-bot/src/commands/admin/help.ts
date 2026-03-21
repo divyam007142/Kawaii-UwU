@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, AttachmentBuilder } from "discord.js";
 import { COLORS, CURRENCY_ICON, cuteFooter } from "../../utils/embeds.js";
-import { createHelpBanner } from "../../utils/canvas.js";
+import { createHelpBanner, createHelpThumbnail } from "../../utils/canvas.js";
 
 export const data = new SlashCommandBuilder()
   .setName("help")
@@ -11,8 +11,13 @@ export const cooldown = 5;
 export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply();
 
-  const bannerBuffer = await createHelpBanner();
-  const attachment   = new AttachmentBuilder(bannerBuffer, { name: "kawaii-banner.png" });
+  const [bannerBuffer, thumbBuffer] = await Promise.all([
+    createHelpBanner(),
+    createHelpThumbnail(),
+  ]);
+
+  const bannerAttachment = new AttachmentBuilder(bannerBuffer, { name: "kawaii-banner.png" });
+  const thumbAttachment  = new AttachmentBuilder(thumbBuffer,  { name: "kawaii-thumb.png"  });
 
   const embed = new EmbedBuilder()
     .setColor(COLORS.kawaii)
@@ -77,10 +82,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           "📺 I post an anime meme every hour~",
       },
     )
-    .setThumbnail(interaction.client.user?.displayAvatarURL() ?? null)
+    .setThumbnail("attachment://kawaii-thumb.png")
     .setImage("attachment://kawaii-banner.png")
     .setFooter({ text: `${cuteFooter()} • ${(interaction.client as any).commands?.size ?? 27} commands loaded ♡` })
     .setTimestamp();
 
-  await interaction.editReply({ embeds: [embed], files: [attachment] });
+  await interaction.editReply({ embeds: [embed], files: [bannerAttachment, thumbAttachment] });
 }
