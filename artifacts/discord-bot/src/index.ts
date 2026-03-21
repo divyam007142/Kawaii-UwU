@@ -1,29 +1,25 @@
-import { Client, GatewayIntentBits, Events } from "discord.js";
-
-const token = process.env["DISCORD_BOT_TOKEN"];
-
-if (!token) {
-  throw new Error("DISCORD_BOT_TOKEN environment variable is required.");
-}
+import { Client, GatewayIntentBits, Collection, Partials } from "discord.js";
+import { loadCommands } from "./handlers/commandHandler.js";
+import { loadEvents } from "./handlers/eventHandler.js";
 
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessageReactions,
   ],
+  partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
-client.once(Events.ClientReady, (readyClient) => {
-  console.log(`Logged in as ${readyClient.user.tag}`);
-});
+(client as any).commands = new Collection();
+(client as any).cooldowns = new Collection();
 
-client.on(Events.MessageCreate, (message) => {
-  if (message.author.bot) return;
+await loadCommands(client);
+await loadEvents(client);
 
-  if (message.content === "!ping") {
-    message.reply("Pong!");
-  }
-});
+const token = process.env.DISCORD_BOT_TOKEN;
+if (!token) throw new Error("DISCORD_BOT_TOKEN is not set");
 
-client.login(token);
+await client.login(token);
